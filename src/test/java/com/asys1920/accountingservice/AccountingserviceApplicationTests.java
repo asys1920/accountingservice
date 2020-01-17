@@ -8,7 +8,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -25,11 +24,12 @@ class AccountingserviceApplicationTests {
 	@Autowired
 	private AccountingRepository accountingRepository;
 
-	private String endpoint = "/bills";
+	private String billEndpoint = "/bills";
+	private String balanceEndpoint = "/balance";
 
 	@Test
 	public void should_ReturnValid_When_Get_ValidRequest() throws Exception {
-		mockMvc.perform(get(endpoint))
+		mockMvc.perform(get(billEndpoint))
 				.andExpect(status().isOk());
 	}
 
@@ -40,19 +40,23 @@ class AccountingserviceApplicationTests {
 		body.put("userId", "5");
 		body.put("creationDate", "2022-05-01");
 		body.put("paymentDeadlineDate", "2022-05-01");
-		mockMvc.perform(post(endpoint)
+		mockMvc.perform(post(billEndpoint)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(body.toString())
 				.accept(MediaType.APPLICATION_JSON))
 				.andExpect(status().isCreated());
 	}
 
-	
+	@Test
+	public void should_ReturnBalance_When_Get_ValidRequest() throws Exception {
+		mockMvc.perform(get(balanceEndpoint))
+				.andExpect(status().isOk());
+	}
 
 	@Test
 	public void should_ReturnErrorMessage_When_Post_EmptyRequest() throws Exception {
 		JSONObject body = new JSONObject();
-		mockMvc.perform(post(endpoint)
+		mockMvc.perform(post(billEndpoint)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(body.toString())
 				.accept(MediaType.APPLICATION_JSON))
@@ -66,7 +70,7 @@ class AccountingserviceApplicationTests {
 		body.put("userId", "5");
 		body.put("creationDate", "2022-05-01");
 		body.put("paymentDeadlineDate", "2022-05-A");
-		mockMvc.perform(post(endpoint)
+		mockMvc.perform(post(billEndpoint)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(body.toString())
 				.accept(MediaType.APPLICATION_JSON))

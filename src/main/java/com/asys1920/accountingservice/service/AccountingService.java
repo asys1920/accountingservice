@@ -1,14 +1,15 @@
 package com.asys1920.accountingservice.service;
 
+import com.asys1920.accountingservice.model.Balance;
 import com.asys1920.accountingservice.model.Bill;
 import com.asys1920.accountingservice.repository.AccountingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class AccountingService {
@@ -16,7 +17,7 @@ public class AccountingService {
     @Autowired
     private AccountingRepository accountingRepository;
 
-    public Bill createBill(Bill bill){
+    public Bill createBill(Bill bill) {
         return accountingRepository.save(bill);
     }
 
@@ -31,11 +32,33 @@ public class AccountingService {
     @Transactional
     public Bill setBillCanceled(Long id) throws NoSuchElementException {
         Optional<Bill> possibill = accountingRepository.findById(id);
-        if(possibill.isPresent()){
+        if (possibill.isPresent()) {
             accountingRepository.setBillCanceled(id);
             return accountingRepository.findById(id).get().cancel();
-        }else{
+        } else {
             throw new NoSuchElementException("Bill can't be canceled, because it doesn't exist");
         }
+    }
+
+    @Transactional
+    public Balance getBalance() {
+        List<Bill> bills = accountingRepository.findAll();
+        return getBalance( bills);
+    }
+
+    @Transactional
+    public Balance getBalance(Date start, Date end) {
+        List<Bill> bills = accountingRepository.findAllWithCreationDate(start, end);
+        return getBalance(bills);
+    }
+
+    private Balance getBalance(List<Bill> bills) {
+        Balance balance = new Balance();
+        Stream<Bill> payedBills = bills.stream().filter(Bill::getIsPayed);
+        Stream<Bill> openBills = bills.stream().filter(b -> !b.getIsPayed());
+        balance.setPayed(payedBills.mapToDouble(Bill::getValue).sum());
+        balance.setOpen(openBills.mapToDouble(Bill::getValue).sum());
+        balance.setSum(balance.getPayed() + balance.getOpen());
+        return balance;
     }
 }

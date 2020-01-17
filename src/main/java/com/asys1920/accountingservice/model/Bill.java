@@ -2,10 +2,7 @@ package com.asys1920.accountingservice.model;
 
 import lombok.Data;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.util.Date;
 
 @Data
@@ -17,7 +14,9 @@ public class Bill{
     Double value;
     Long userId;
     Long referenceBill;
+    @Temporal(TemporalType.DATE)
     Date creationDate;
+    @Temporal(TemporalType.DATE)
     Date paymentDeadlineDate;
     Boolean isPayed;
     Boolean isCanceled;
