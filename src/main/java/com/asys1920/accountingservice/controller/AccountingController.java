@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.ConstraintViolation;
 import javax.validation.Valid;
 import javax.validation.Validation;
+import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -62,25 +63,19 @@ public class AccountingController {
     }
 
     @GetMapping("/balance")
-    public ResponseEntity<BalanceDTO> getBalance() {
-        Balance balance = accountingService.getBalance();
-
-        return new ResponseEntity<>(
-                BalanceMapper.INSTANCE.balanceToBalanceDTO(balance),
-                HttpStatus.OK);
-    }
-
-    @GetMapping("/balance/{start}/{end}")
-    public ResponseEntity<BalanceDTO> getBalance(@PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") Date start,
-                                                 @PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") Date end) {
+    public ResponseEntity<BalanceDTO> getBalance(@RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date start,
+                                                 @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date end) {
+        if (start == null)
+            start = new Date(0);
+        if (end == null)
+            end = new Date();
         Balance balance = accountingService.getBalance(start, end);
-
         return new ResponseEntity<>(
                 BalanceMapper.INSTANCE.balanceToBalanceDTO(balance),
                 HttpStatus.OK);
     }
 
-    @PatchMapping("/bills/cancel/{id}")
+    @PatchMapping("/bills/{id}/cancel")
     public ResponseEntity<BillDTO> cancelBill(@PathVariable Long id) {
         Bill bill = accountingService.setBillCanceled(id);
         return new ResponseEntity<>(
