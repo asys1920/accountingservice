@@ -2,20 +2,22 @@ package com.asys1920.accountingservice.controller;
 
 import com.asys1920.accountingservice.adapter.BalanceMapper;
 import com.asys1920.accountingservice.adapter.BillMapper;
-import com.asys1920.accountingservice.adapter.UserMapper;
 import com.asys1920.accountingservice.exceptions.ValidationException;
 import com.asys1920.accountingservice.model.Balance;
 import com.asys1920.accountingservice.model.Bill;
 import com.asys1920.accountingservice.service.AccountingService;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
 
 import javax.validation.ConstraintViolation;
-import javax.validation.Valid;
 import javax.validation.Validation;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -31,19 +33,20 @@ public class AccountingController {
         this.accountingService = accountingService;
     }
 
+    @ApiOperation(value = "Create a bill", response = BillDTO.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successfully created bill"),
+            @ApiResponse(code = 401, message = "You are not authorized to view the resource"),
+            @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden"),
+            @ApiResponse(code = 404, message = "The resource you were trying to reach is not found")})
     @PostMapping("/bills")
-    public ResponseEntity<BillDTO> createBill(@Valid @RequestBody BillDTO billDTO) throws ValidationException {
+    public ResponseEntity<BillDTO> createBill(@RequestBody BillDTO billDTO) throws ValidationException {
         Set<ConstraintViolation<BillDTO>> validate = Validation.buildDefaultValidatorFactory().getValidator().validate(billDTO);
         if (!validate.isEmpty()) {
             throw new ValidationException(validate);
 
         }
-        String userServiceUrl = "http://localhost:8081/user/";
-        Long userId = billDTO.userId;
-        RestTemplate restTemplate = new RestTemplate();
-        UserDTO userDTO = restTemplate
-                .getForObject(userServiceUrl + userId, UserDTO.class);
-        Bill bill = accountingService.createBill(BillMapper.INSTANCE.billDTOtoBill(billDTO), UserMapper.INSTANCE.userDTOtoUser(userDTO));
+        Bill bill = accountingService.createBill(BillMapper.INSTANCE.billDTOtoBill(billDTO));
         BillDTO responseDTO = BillMapper.INSTANCE.billToBillDTO(bill);
         return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
     }
@@ -80,9 +83,9 @@ public class AccountingController {
                 HttpStatus.OK);
     }
 
-    @PatchMapping("/bills/{id}/cancel")
-    public ResponseEntity<BillDTO> cancelBill(@PathVariable Long id) {
-        Bill bill = accountingService.setBillCanceled(id);
+    @PatchMapping("/bills/{id}")
+    public ResponseEntity<BillDTO> cancelBill(@RequestBody BillDTO billDTO) {
+        Bill bill = accountingService.updateBill(BillMapper.INSTANCE.billDTOtoBill(billDTO));
         return new ResponseEntity<>(
                 BillMapper.INSTANCE.billToBillDTO(bill),
                 HttpStatus.OK);
