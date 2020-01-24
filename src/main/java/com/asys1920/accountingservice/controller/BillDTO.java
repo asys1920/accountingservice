@@ -20,4 +20,10 @@ public class BillDTO {
     Date paymentDeadlineDate;
     Boolean isPayed = false;
     Boolean isCanceled = false;
+
+    String street;
+    String zipCode;
+    String city;
+    String name;
+    String country;
 }

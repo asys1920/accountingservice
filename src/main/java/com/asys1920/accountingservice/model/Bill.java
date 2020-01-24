@@ -21,6 +21,12 @@ public class Bill{
     Boolean isPayed;
     Boolean isCanceled;
 
+    String street;
+    String zipCode;
+    String city;
+    String name;
+    String country;
+
     public Bill cancel(){
         this.setIsCanceled(true);
         return this;

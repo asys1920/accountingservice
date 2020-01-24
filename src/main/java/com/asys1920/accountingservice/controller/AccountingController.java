@@ -2,6 +2,7 @@ package com.asys1920.accountingservice.controller;
 
 import com.asys1920.accountingservice.adapter.BalanceMapper;
 import com.asys1920.accountingservice.adapter.BillMapper;
+import com.asys1920.accountingservice.adapter.UserMapper;
 import com.asys1920.accountingservice.exceptions.ValidationException;
 import com.asys1920.accountingservice.model.Balance;
 import com.asys1920.accountingservice.model.Bill;
@@ -10,11 +11,11 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Valid;
 import javax.validation.Validation;
-import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -37,8 +38,12 @@ public class AccountingController {
             throw new ValidationException(validate);
 
         }
-        Bill billy = BillMapper.INSTANCE.billDTOtoBill(billDTO);
-        Bill bill = accountingService.createBill(billy);
+        String userServiceUrl = "http://localhost:8081/user/";
+        Long userId = billDTO.userId;
+        RestTemplate restTemplate = new RestTemplate();
+        UserDTO userDTO = restTemplate
+                .getForObject(userServiceUrl + userId, UserDTO.class);
+        Bill bill = accountingService.createBill(BillMapper.INSTANCE.billDTOtoBill(billDTO), UserMapper.INSTANCE.userDTOtoUser(userDTO));
         BillDTO responseDTO = BillMapper.INSTANCE.billToBillDTO(bill);
         return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
     }

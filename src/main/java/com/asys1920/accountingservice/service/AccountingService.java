@@ -2,22 +2,36 @@ package com.asys1920.accountingservice.service;
 
 import com.asys1920.accountingservice.model.Balance;
 import com.asys1920.accountingservice.model.Bill;
+import com.asys1920.accountingservice.model.User;
 import com.asys1920.accountingservice.repository.AccountingRepository;
+import lombok.var;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
 public class AccountingService {
 
-    @Autowired
-    private AccountingRepository accountingRepository;
+    private final AccountingRepository accountingRepository;
 
-    public Bill createBill(Bill bill) {
+    public AccountingService(AccountingRepository accountingRepository) {
+        this.accountingRepository = accountingRepository;
+    }
+
+    public Bill createBill(Bill bill, User user) {
+        bill.setStreet(user.getStreet());
+        bill.setZipCode(user.getZipCode());
+        bill.setName(user.getName());
+        bill.setCity(user.getCity());
+        bill.setCountry(user.getCountry());
         return accountingRepository.save(bill);
     }
 
@@ -43,7 +57,7 @@ public class AccountingService {
     @Transactional
     public Balance getBalance() {
         List<Bill> bills = accountingRepository.findAll();
-        return getBalance( bills);
+        return getBalance(bills);
     }
 
     @Transactional
