@@ -5,6 +5,7 @@ import com.asys1920.accountingservice.model.Balance;
 import com.asys1920.accountingservice.model.Bill;
 import com.asys1920.accountingservice.model.User;
 import com.asys1920.accountingservice.repository.AccountingRepository;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
