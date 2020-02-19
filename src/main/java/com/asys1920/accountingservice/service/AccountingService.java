@@ -1,10 +1,10 @@
 package com.asys1920.accountingservice.service;
 
 import com.asys1920.accountingservice.adapter.UserServiceAdapter;
-import com.asys1920.accountingservice.model.Balance;
-import com.asys1920.accountingservice.model.Bill;
-import com.asys1920.accountingservice.model.User;
 import com.asys1920.accountingservice.repository.AccountingRepository;
+import com.asys1920.model.Balance;
+import com.asys1920.model.Bill;
+import com.asys1920.model.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

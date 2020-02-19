@@ -1,11 +1,13 @@
 package com.asys1920.accountingservice.controller;
 
-import com.asys1920.accountingservice.adapter.BalanceMapper;
-import com.asys1920.accountingservice.adapter.BillMapper;
 import com.asys1920.accountingservice.exceptions.ValidationException;
-import com.asys1920.accountingservice.model.Balance;
-import com.asys1920.accountingservice.model.Bill;
 import com.asys1920.accountingservice.service.AccountingService;
+import com.asys1920.dto.BalanceDTO;
+import com.asys1920.dto.BillDTO;
+import com.asys1920.mapper.BalanceMapper;
+import com.asys1920.mapper.BillMapper;
+import com.asys1920.model.Balance;
+import com.asys1920.model.Bill;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -16,8 +18,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
-import java.text.SimpleDateFormat;
-import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
