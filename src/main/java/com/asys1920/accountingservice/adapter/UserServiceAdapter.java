@@ -1,7 +1,8 @@
 package com.asys1920.accountingservice.adapter;
 
-import com.asys1920.accountingservice.controller.UserDTO;
-import com.asys1920.accountingservice.model.User;
+import com.asys1920.dto.UserDTO;
+import com.asys1920.mapper.UserMapper;
+import com.asys1920.model.User;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.stereotype.Component;
