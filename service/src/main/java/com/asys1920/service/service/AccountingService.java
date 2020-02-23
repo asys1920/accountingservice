@@ -1,15 +1,17 @@
-package com.asys1920.accountingservice.service;
+package com.asys1920.service.service;
 
-import com.asys1920.accountingservice.adapter.UserServiceAdapter;
-import com.asys1920.accountingservice.repository.AccountingRepository;
+import com.asys1920.service.adapter.UserServiceAdapter;
+import com.asys1920.service.repository.AccountingRepository;
 import com.asys1920.model.Balance;
 import com.asys1920.model.Bill;
 import com.asys1920.model.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 @Service
@@ -23,14 +25,14 @@ public class AccountingService {
         this.userServiceAdapter = userServiceAdapter;
     }
 
+
+    public boolean userExists(long userId) {
+        User user = userServiceAdapter.getUser(userId);
+        return user != null;
+    }
+
     public Bill createBill(Bill bill) {
-        User user = userServiceAdapter.getUser(bill.getUserId());
-        bill.setStreet(user.getStreet());
-        bill.setZipCode(user.getZipCode());
-        bill.setName(user.getName());
-        bill.setCity(user.getCity());
-        bill.setCountry(user.getCountry());
-        return accountingRepository.save(bill);
+        return saveBill(bill);
     }
 
     public List<Bill> getAllBills() {
@@ -38,7 +40,12 @@ public class AccountingService {
     }
 
     public Bill getBill(long id) {
-        return accountingRepository.findById(id).get();
+        Optional<Bill> possibill = accountingRepository.findById(id);
+        if (possibill.isPresent()) {
+            return possibill.get();
+        } else {
+            throw new NoSuchElementException("No bill with id: " + id + " is known.");
+        }
     }
 
     @Transactional
@@ -48,12 +55,12 @@ public class AccountingService {
     }
 
     @Transactional
-    public Balance getBalance(Date start, Date end) {
+    public Balance getBalance(Instant start, Instant end) {
         List<Bill> bills = accountingRepository.findAllByAndCreationDateIsBetween(start, end);
         return getBalance(bills, start, end);
     }
 
-    private Balance getBalance(List<Bill> bills, Date start, Date end) {
+    private Balance getBalance(List<Bill> bills, Instant start, Instant end) {
         Balance balance = new Balance();
         balance.setStart(start);
         balance.setEnd(end);
@@ -67,6 +74,14 @@ public class AccountingService {
 
     @Transactional
     public Bill updateBill(Bill bill) {
-        return accountingRepository.save(bill);
+        return saveBill(bill);
+    }
+
+    private Bill saveBill(Bill bill) {
+        if(userExists(bill.getUserId())) {
+            return accountingRepository.save(bill);
+        }else{
+            throw new NoSuchElementException("There is no user with id: "+ bill.getUserId() +" known.");
+        }
     }
 }

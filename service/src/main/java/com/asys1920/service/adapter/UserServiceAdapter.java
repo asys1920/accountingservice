@@ -1,4 +1,4 @@
-package com.asys1920.accountingservice.adapter;
+package com.asys1920.service.adapter;
 
 import com.asys1920.dto.UserDTO;
 import com.asys1920.mapper.UserMapper;
@@ -12,7 +12,7 @@ import org.springframework.web.client.RestTemplate;
 @Component
 public class UserServiceAdapter {
 
-    @Value("${userService.url}")
+    @Value("http://localhost:8080/users/")
     private String userServiceUrl;
     final RestTemplate restTemplate;
 

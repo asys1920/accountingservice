@@ -1,4 +1,4 @@
-package com.asys1920.accountingservice.exceptions;
+package com.asys1920.service.exceptions;
 import javax.validation.ConstraintViolation;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -8,5 +8,8 @@ public class ValidationException extends Exception {
         super(violations.stream().map(
                 ConstraintViolation::getMessage)
                 .collect(Collectors.joining(System.lineSeparator())));
+    }
+    public ValidationException(String s) {
+        super(s);
     }
 }

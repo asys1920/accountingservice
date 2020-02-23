@@ -1,24 +1,23 @@
-package com.asys1920.accountingservice.controller;
+package com.asys1920.service.controller;
 
-import com.asys1920.accountingservice.exceptions.ValidationException;
-import com.asys1920.accountingservice.service.AccountingService;
 import com.asys1920.dto.BalanceDTO;
 import com.asys1920.dto.BillDTO;
 import com.asys1920.mapper.BalanceMapper;
 import com.asys1920.mapper.BillMapper;
 import com.asys1920.model.Balance;
 import com.asys1920.model.Bill;
+import com.asys1920.service.exceptions.ValidationException;
+import com.asys1920.service.service.AccountingService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -47,8 +46,9 @@ public class AccountingController {
 
         }
         Bill bill = accountingService.createBill(BillMapper.INSTANCE.billDTOtoBill(billDTO));
-        BillDTO responseDTO = BillMapper.INSTANCE.billToBillDTO(bill);
-        return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
+        return new ResponseEntity<>(
+                BillMapper.INSTANCE.billToBillDTO(bill),
+                HttpStatus.CREATED);
     }
 
 
@@ -64,19 +64,22 @@ public class AccountingController {
     @GetMapping("/bills/{id}")
     public ResponseEntity<BillDTO> getBill(@PathVariable Long id) {
         Bill bill = accountingService.getBill(id);
-
         return new ResponseEntity<>(
                 BillMapper.INSTANCE.billToBillDTO(bill),
                 HttpStatus.OK);
     }
 
     @GetMapping("/balance")
-    public ResponseEntity<BalanceDTO> getBalance(@RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date start,
-                                                 @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date end) {
+    public ResponseEntity<BalanceDTO> getBalance(@RequestParam(required = false) Instant start,
+                                                 @RequestParam(required = false) Instant end)
+            throws ValidationException {
         if (start == null)
-            start = new Date(0);
+            start = Instant.ofEpochMilli(0L);
         if (end == null)
-            end = new Date();
+            end = Instant.now();
+        if (end.isBefore(start)) {
+            throw new ValidationException("start has to be before end when requesting a balance");
+        }
         Balance balance = accountingService.getBalance(start, end);
         return new ResponseEntity<>(
                 BalanceMapper.INSTANCE.balanceToBalanceDTO(balance),
@@ -84,7 +87,7 @@ public class AccountingController {
     }
 
     @PatchMapping("/bills/{id}")
-    public ResponseEntity<BillDTO> cancelBill(@RequestBody BillDTO billDTO) {
+    public ResponseEntity<BillDTO> updateBill(@RequestBody BillDTO billDTO) {
         Bill bill = accountingService.updateBill(BillMapper.INSTANCE.billDTOtoBill(billDTO));
         return new ResponseEntity<>(
                 BillMapper.INSTANCE.billToBillDTO(bill),
