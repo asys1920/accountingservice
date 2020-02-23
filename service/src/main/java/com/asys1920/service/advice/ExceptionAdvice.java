@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.net.ConnectException;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
@@ -42,7 +41,7 @@ public class ExceptionAdvice {
     }
 
     @Data
-    private class ErrorMessage {
+    private static class ErrorMessage {
         private final String cause = "VALIDATION FAILED";
         private List<String> description;
 

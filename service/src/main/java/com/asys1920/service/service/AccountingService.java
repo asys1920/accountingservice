@@ -56,7 +56,7 @@ public class AccountingService {
 
     @Transactional
     public Balance getBalance(Instant start, Instant end) {
-        List<Bill> bills = accountingRepository.findAllByAndCreationDateIsBetween(start, end);
+        List<Bill> bills = accountingRepository.findAllCreationDateIsBetween(start, end);
         return getBalance(bills, start, end);
     }
 
