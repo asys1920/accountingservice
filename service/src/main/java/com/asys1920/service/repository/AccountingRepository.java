@@ -9,5 +9,6 @@ import java.util.List;
 
 
 public interface AccountingRepository extends JpaRepository<Bill, Long> {
-    List<Bill> findAllCreationDateIsBetween(Instant start, Instant end);
+    //List<Bill> findAllCreationDateIsBetween(Instant start, Instant end);
+    List<Bill> findAllByCreationDateBetween(Instant start, Instant end);
 }
