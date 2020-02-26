@@ -64,11 +64,11 @@ public class AccountingService {
         Balance balance = new Balance();
         balance.setStart(start);
         balance.setEnd(end);
-        Stream<Bill> payedBills = bills.stream().filter(Bill::getIsPayed);
-        Stream<Bill> openBills = bills.stream().filter(b -> !b.getIsPayed());
-        balance.setPayed(payedBills.mapToDouble(Bill::getValue).sum());
+        Stream<Bill> payedBills = bills.stream().filter(Bill::isPaid);
+        Stream<Bill> openBills = bills.stream().filter(b -> !b.isPaid());
+        balance.setPaid(payedBills.mapToDouble(Bill::getValue).sum());
         balance.setOpen(openBills.mapToDouble(Bill::getValue).sum());
-        balance.setSum(balance.getPayed() + balance.getOpen());
+        balance.setSum(balance.getPaid() + balance.getOpen());
         return balance;
     }
 
