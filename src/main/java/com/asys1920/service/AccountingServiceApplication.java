@@ -12,9 +12,6 @@ import org.springframework.context.annotation.Bean;
 @SpringBootApplication
 public class AccountingServiceApplication {
 
-	public AccountingServiceApplication() {
-	}
-
 	public static void main(String[] args) {
 		SpringApplication.run(AccountingServiceApplication.class, args);
 	}
