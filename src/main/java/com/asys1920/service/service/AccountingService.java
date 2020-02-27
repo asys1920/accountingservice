@@ -1,10 +1,10 @@
 package com.asys1920.service.service;
 
-import com.asys1920.service.adapter.UserServiceAdapter;
-import com.asys1920.service.repository.AccountingRepository;
 import com.asys1920.model.Balance;
 import com.asys1920.model.Bill;
 import com.asys1920.model.User;
+import com.asys1920.service.adapter.UserServiceAdapter;
+import com.asys1920.service.repository.AccountingRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,9 +40,9 @@ public class AccountingService {
     }
 
     public Bill getBill(long id) {
-        Optional<Bill> possibill = accountingRepository.findById(id);
-        if (possibill.isPresent()) {
-            return possibill.get();
+        Optional<Bill> optionalBill = accountingRepository.findById(id);
+        if (optionalBill.isPresent()) {
+            return optionalBill.get();
         } else {
             throw new NoSuchElementException("No bill with id: " + id + " is known.");
         }
