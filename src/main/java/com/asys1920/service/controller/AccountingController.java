@@ -25,8 +25,9 @@ import java.util.stream.Collectors;
 @RestController
 public class AccountingController {
 
-    final
-    AccountingService accountingService;
+    private static final String BILLS_PATH = "/bills";
+    private static final String BALANCE_PATH = "/balance";
+    final    AccountingService accountingService;
 
     public AccountingController(AccountingService accountingService) {
         this.accountingService = accountingService;
@@ -38,7 +39,7 @@ public class AccountingController {
             @ApiResponse(code = 401, message = "You are not authorized to view the resource"),
             @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden"),
             @ApiResponse(code = 404, message = "The resource you were trying to reach is not found")})
-    @PostMapping("/bills")
+    @PostMapping(BILLS_PATH)
     public ResponseEntity<BillDTO> createBill(@RequestBody BillDTO billDTO) throws ValidationException {
         Set<ConstraintViolation<BillDTO>> validate = Validation.buildDefaultValidatorFactory().getValidator().validate(billDTO);
         if (!validate.isEmpty()) {
@@ -57,7 +58,7 @@ public class AccountingController {
             @ApiResponse(code = 401, message = "You are not authorized to view the resource"),
             @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden")
     })
-    @GetMapping("/bills")
+    @GetMapping(BILLS_PATH)
     public ResponseEntity<List<BillDTO>> getAllBill() {
         List<Bill> allBills = accountingService.getAllBills();
         List<BillDTO> allBillDTOs = allBills.stream()
@@ -72,7 +73,7 @@ public class AccountingController {
             @ApiResponse(code = 401, message = "You are not authorized to view the resource"),
             @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden"),
             @ApiResponse(code = 404, message = "The resource you were trying to reach is not found")})
-    @GetMapping("/bills/{id}")
+    @GetMapping(BILLS_PATH+"/{id}")
     public ResponseEntity<BillDTO> getBill(@PathVariable Long id) {
         Bill bill = accountingService.getBill(id);
         return new ResponseEntity<>(
@@ -89,7 +90,7 @@ public class AccountingController {
             @ApiResponse(code = 200, message = "Successfully fetched balance"),
             @ApiResponse(code = 401, message = "You are not authorized to view the resource"),
             @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden")})
-    @GetMapping("/balance")
+    @GetMapping(BALANCE_PATH)
     public ResponseEntity<BalanceDTO> getBalance(@RequestParam(required = false) Instant start,
                                                  @RequestParam(required = false) Instant end)
             throws ValidationException {
@@ -112,7 +113,7 @@ public class AccountingController {
             @ApiResponse(code = 401, message = "You are not authorized to view the resource"),
             @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden"),
             @ApiResponse(code = 404, message = "The resource you were trying to reach is not found")})
-    @PatchMapping("/bills/{id}")
+    @PatchMapping(BILLS_PATH+"/{id}")
     public ResponseEntity<BillDTO> updateBill(@RequestBody BillDTO billDTO) {
         Bill bill = accountingService.updateBill(BillMapper.INSTANCE.billDTOtoBill(billDTO));
         return new ResponseEntity<>(
