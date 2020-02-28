@@ -31,3 +31,5 @@ build/
 .vscode/
 
 *.log
+
+out/artifacts/accountingservice_jar/
