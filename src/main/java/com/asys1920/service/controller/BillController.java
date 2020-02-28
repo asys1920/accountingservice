@@ -25,13 +25,13 @@ import java.util.stream.Collectors;
 
 @Api(produces = "application/json")
 @RestController
-public class AccountingController {
+public class BillController {
 
-    private static final Logger LOG = LoggerFactory.getLogger(AccountingController.class);
+    private static final Logger LOG = LoggerFactory.getLogger(BillController.class);
     private static final String BILLS_PATH = "/bills";
     final AccountingService accountingService;
 
-    public AccountingController(AccountingService accountingService) {
+    public BillController(AccountingService accountingService) {
         this.accountingService = accountingService;
     }
 
