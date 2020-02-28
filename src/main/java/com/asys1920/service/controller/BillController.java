@@ -73,7 +73,7 @@ public class BillController {
         return ResponseEntity.ok().body(allBillDTOs);
     }
 
-    @ApiOperation(value = "Get a existing bill", response = BillDTO.class)
+    @ApiOperation(value = "Get an existing bill", response = BillDTO.class)
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successfully fetched bill"),
             @ApiResponse(code = 401, message = "You are not authorized to view the resource"),
@@ -96,7 +96,7 @@ public class BillController {
             @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden"),
             @ApiResponse(code = 404, message = "The resource you were trying to reach is not found")})
     @PatchMapping(BILLS_PATH + "/{id}")
-    public ResponseEntity<BillDTO> updateBill(@RequestBody BillDTO billDTO) throws ServiceUnavailableException {
+    public ResponseEntity<BillDTO> updateBill(@RequestBody BillDTO billDTO) {
         LOG.trace(String.format("PATCH %s initiated", BILLS_PATH));
         Bill bill = accountingService.updateBill(BillMapper.INSTANCE.billDTOtoBill(billDTO));
         LOG.trace(String.format("PATCH %s completed", BILLS_PATH));
