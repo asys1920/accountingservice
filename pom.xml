@@ -15,10 +15,6 @@
     <description>Service for accounting management</description>
     <packaging>jar</packaging>
 
-    <properties>
-        <java.version>11</java.version>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>com.asys1920</groupId>
