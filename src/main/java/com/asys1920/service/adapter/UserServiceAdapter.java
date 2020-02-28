@@ -13,7 +13,7 @@ import org.springframework.web.client.RestTemplate;
 @Component
 public class UserServiceAdapter {
 
-    @Value( value = "${user.url}" )
+    @Value(value = "${user.url}")
     private String userServiceUrl;
     final RestTemplate restTemplate;
 
@@ -21,13 +21,18 @@ public class UserServiceAdapter {
         this.restTemplate = restTemplateBuilder.build();
     }
 
-
+    /**
+     * Fetches a user from the user service
+     *
+     * @param userId id of the user to be fetched
+     * @return the use object associated with the given id
+     */
     public User getUser(Long userId) throws ServiceUnavailableException {
         try {
             UserDTO userDTO = restTemplate
                     .getForObject(userServiceUrl + userId, UserDTO.class);
             return UserMapper.INSTANCE.userDTOtoUser(userDTO);
-        } catch (Exception ex){
+        } catch (Exception ex) {
             throw new ServiceUnavailableException("UserService is currently unavailable. Please try again later.");
         }
     }
