@@ -1,5 +1,6 @@
 package com.asys1920.service.advice;
 
+import com.asys1920.service.exceptions.ServiceUnavailableException;
 import com.asys1920.service.exceptions.ValidationException;
 import lombok.Data;
 import net.minidev.json.JSONObject;
@@ -14,7 +15,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.net.ConnectException;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
@@ -47,14 +47,11 @@ public class ExceptionAdvice {
         return new ResponseEntity<>(jsonFromException(ex), HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(ConnectException.class)
+    @ExceptionHandler(ServiceUnavailableException.class)
     @ResponseBody
     public ResponseEntity<JSONObject> handleAdapterNotConnected(Exception ex) {
         LOG.error(ex.getMessage(), ex);
-        JSONObject response = jsonFromException(ex);
-        String newMessage = "Userservice is currently unavailable, please try again later.";
-        response.put("message", newMessage);
-        return new ResponseEntity<>(response, HttpStatus.FAILED_DEPENDENCY);
+        return new ResponseEntity<>(jsonFromException(ex), HttpStatus.FAILED_DEPENDENCY);
     }
 
 

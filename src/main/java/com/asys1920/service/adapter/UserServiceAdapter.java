@@ -3,6 +3,7 @@ package com.asys1920.service.adapter;
 import com.asys1920.dto.UserDTO;
 import com.asys1920.mapper.UserMapper;
 import com.asys1920.model.User;
+import com.asys1920.service.exceptions.ServiceUnavailableException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.stereotype.Component;
@@ -12,7 +13,7 @@ import org.springframework.web.client.RestTemplate;
 @Component
 public class UserServiceAdapter {
 
-    @Value( "${adapter.user.port}" )
+    @Value( value = "http://localhost:${adapter.user.port}/users/" )
     private String userServiceUrl;
     final RestTemplate restTemplate;
 
@@ -21,9 +22,13 @@ public class UserServiceAdapter {
     }
 
 
-    public User getUser(Long userId) {
-        UserDTO userDTO = restTemplate
-                .getForObject(userServiceUrl + userId, UserDTO.class);
-        return UserMapper.INSTANCE.userDTOtoUser(userDTO);
+    public User getUser(Long userId) throws ServiceUnavailableException {
+        try {
+            UserDTO userDTO = restTemplate
+                    .getForObject(userServiceUrl + userId, UserDTO.class);
+            return UserMapper.INSTANCE.userDTOtoUser(userDTO);
+        } catch (Exception ex){
+            throw new ServiceUnavailableException("UserService is currently unavailable. Please try again later.");
+        }
     }
 }

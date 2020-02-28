@@ -4,6 +4,7 @@ import com.asys1920.model.Balance;
 import com.asys1920.model.Bill;
 import com.asys1920.model.User;
 import com.asys1920.service.adapter.UserServiceAdapter;
+import com.asys1920.service.exceptions.ServiceUnavailableException;
 import com.asys1920.service.repository.AccountingRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,12 +30,12 @@ public class AccountingService {
     }
 
 
-    private boolean userExists(long userId) {
+    private boolean userExists(long userId) throws ServiceUnavailableException {
         User user = userServiceAdapter.getUser(userId);
         return user != null;
     }
 
-    public Bill createBill(Bill bill) {
+    public Bill createBill(Bill bill) throws ServiceUnavailableException {
         LOG.trace("SERVICE createBill() initiated");
         return saveBill(bill);
     }
@@ -78,12 +79,12 @@ public class AccountingService {
     }
 
     @Transactional
-    public Bill updateBill(Bill bill) {
+    public Bill updateBill(Bill bill) throws ServiceUnavailableException {
         LOG.trace("SERVICE updateBill() initiated");
         return saveBill(bill);
     }
 
-    private Bill saveBill(Bill bill) {
+    private Bill saveBill(Bill bill) throws ServiceUnavailableException {
         LOG.trace("SERVICE saveBill() initiated");
         if (userExists(bill.getUserId())) {
             return accountingRepository.save(bill);
