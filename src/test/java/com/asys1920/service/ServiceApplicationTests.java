@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.Instant;
 import java.time.Period;
+import java.util.Optional;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -177,6 +178,7 @@ class ServiceApplicationTests {
         JSONObject body = jsonFromBill(validBill);
         Mockito.when(userServiceAdapter.getUser(validBill.getUserId())).thenReturn(createUser());
         Mockito.when(repository.save(Mockito.any(Bill.class))).thenReturn(validBill);
+        Mockito.when(repository.findById(validBill.getId())).thenReturn(Optional.of(validBill));
         mockMvc.perform(patch(billEndpoint + "/" + body.getString("id"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(body.toString())
