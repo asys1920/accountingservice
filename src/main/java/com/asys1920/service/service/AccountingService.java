@@ -5,6 +5,8 @@ import com.asys1920.model.Bill;
 import com.asys1920.model.User;
 import com.asys1920.service.adapter.UserServiceAdapter;
 import com.asys1920.service.repository.AccountingRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +19,7 @@ import java.util.stream.Stream;
 @Service
 public class AccountingService {
 
+    private static final Logger LOG = LoggerFactory.getLogger(AccountingService.class);
     private final AccountingRepository accountingRepository;
     private final UserServiceAdapter userServiceAdapter;
 
@@ -26,22 +29,26 @@ public class AccountingService {
     }
 
 
-    public boolean userExists(long userId) {
+    private boolean userExists(long userId) {
         User user = userServiceAdapter.getUser(userId);
         return user != null;
     }
 
     public Bill createBill(Bill bill) {
+        LOG.trace("SERVICE createBill() initiated");
         return saveBill(bill);
     }
 
     public List<Bill> getAllBills() {
+        LOG.trace("SERVICE getAllBills() initated");
         return accountingRepository.findAll();
     }
 
     public Bill getBill(long id) {
+        LOG.trace(String.format("SERVICE getBill(%d) initiated", id));
         Optional<Bill> optionalBill = accountingRepository.findById(id);
         if (optionalBill.isPresent()) {
+            LOG.trace("SERVICE getBalance() completed");
             return optionalBill.get();
         } else {
             throw new NoSuchElementException("No bill with id: " + id + " is known.");
@@ -49,18 +56,15 @@ public class AccountingService {
     }
 
     @Transactional
-    public Balance getBalance() {
-        List<Bill> bills = accountingRepository.findAll();
-        return getBalance(bills, null, null);
-    }
-
-    @Transactional
     public Balance getBalance(Instant start, Instant end) {
+        LOG.trace("SERVICE getBalance() initiated");
         List<Bill> bills = accountingRepository.findAllByCreationDateBetween(start, end);
-        return getBalance(bills, start, end);
+        LOG.trace("SERVICE getBalance() completed");
+        return calculateBalance(bills, start, end);
     }
 
-    private Balance getBalance(List<Bill> bills, Instant start, Instant end) {
+    private Balance calculateBalance(List<Bill> bills, Instant start, Instant end) {
+        LOG.trace("SERVICE calculateBalance() initiated");
         Balance balance = new Balance();
         balance.setStart(start);
         balance.setEnd(end);
@@ -69,19 +73,22 @@ public class AccountingService {
         balance.setPaid(payedBills.mapToDouble(Bill::getValue).sum());
         balance.setOpen(openBills.mapToDouble(Bill::getValue).sum());
         balance.setSum(balance.getPaid() + balance.getOpen());
+        LOG.trace("SERVICE calculateBalance() completed");
         return balance;
     }
 
     @Transactional
     public Bill updateBill(Bill bill) {
+        LOG.trace("SERVICE updateBill() initiated");
         return saveBill(bill);
     }
 
     private Bill saveBill(Bill bill) {
-        if(userExists(bill.getUserId())) {
+        LOG.trace("SERVICE saveBill() initiated");
+        if (userExists(bill.getUserId())) {
             return accountingRepository.save(bill);
-        }else{
-            throw new NoSuchElementException("There is no user with id: "+ bill.getUserId() +" known.");
+        } else {
+            throw new NoSuchElementException("There is no user with id: " + bill.getUserId() + " known.");
         }
     }
 }

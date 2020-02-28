@@ -9,6 +9,8 @@ import com.asys1920.model.Bill;
 import com.asys1920.service.exceptions.ValidationException;
 import com.asys1920.service.service.AccountingService;
 import io.swagger.annotations.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,9 +27,10 @@ import java.util.stream.Collectors;
 @RestController
 public class AccountingController {
 
+    private static final Logger LOG = LoggerFactory.getLogger(AccountingController.class);
     private static final String BILLS_PATH = "/bills";
     private static final String BALANCE_PATH = "/balance";
-    final    AccountingService accountingService;
+    final AccountingService accountingService;
 
     public AccountingController(AccountingService accountingService) {
         this.accountingService = accountingService;
@@ -41,12 +44,14 @@ public class AccountingController {
             @ApiResponse(code = 404, message = "The resource you were trying to reach is not found")})
     @PostMapping(BILLS_PATH)
     public ResponseEntity<BillDTO> createBill(@RequestBody BillDTO billDTO) throws ValidationException {
+        LOG.trace(String.format("POST %s initiated", BILLS_PATH) );
         Set<ConstraintViolation<BillDTO>> validate = Validation.buildDefaultValidatorFactory().getValidator().validate(billDTO);
         if (!validate.isEmpty()) {
             throw new ValidationException(validate);
 
         }
         Bill bill = accountingService.createBill(BillMapper.INSTANCE.billDTOtoBill(billDTO));
+        LOG.trace(String.format("POST %s completed", BILLS_PATH));
         return new ResponseEntity<>(
                 BillMapper.INSTANCE.billToBillDTO(bill),
                 HttpStatus.CREATED);
@@ -60,10 +65,12 @@ public class AccountingController {
     })
     @GetMapping(BILLS_PATH)
     public ResponseEntity<List<BillDTO>> getAllBill() {
+        LOG.trace(String.format("GET %s initiated", BILLS_PATH));
         List<Bill> allBills = accountingService.getAllBills();
         List<BillDTO> allBillDTOs = allBills.stream()
                 .map(BillMapper.INSTANCE::billToBillDTO)
                 .collect(Collectors.toList());
+        LOG.trace(String.format("GET %s completed", BILLS_PATH));
         return ResponseEntity.ok().body(allBillDTOs);
     }
 
@@ -73,9 +80,11 @@ public class AccountingController {
             @ApiResponse(code = 401, message = "You are not authorized to view the resource"),
             @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden"),
             @ApiResponse(code = 404, message = "The resource you were trying to reach is not found")})
-    @GetMapping(BILLS_PATH+"/{id}")
+    @GetMapping(BILLS_PATH + "/{id}")
     public ResponseEntity<BillDTO> getBill(@PathVariable Long id) {
+        LOG.trace(String.format("GET %s %d initiated", BILLS_PATH, id));
         Bill bill = accountingService.getBill(id);
+        LOG.trace(String.format("GET %s %d completed", BILLS_PATH, id));
         return new ResponseEntity<>(
                 BillMapper.INSTANCE.billToBillDTO(bill),
                 HttpStatus.OK);
@@ -94,6 +103,7 @@ public class AccountingController {
     public ResponseEntity<BalanceDTO> getBalance(@RequestParam(required = false) Instant start,
                                                  @RequestParam(required = false) Instant end)
             throws ValidationException {
+        LOG.trace(String.format("GET %s initiated", BALANCE_PATH), start, end);
         if (start == null)
             start = Instant.ofEpochMilli(0L);
         if (end == null)
@@ -102,6 +112,7 @@ public class AccountingController {
             throw new ValidationException("start has to be before end when requesting a balance");
         }
         Balance balance = accountingService.getBalance(start, end);
+        LOG.trace(String.format("GET %s completed", BALANCE_PATH));
         return new ResponseEntity<>(
                 BalanceMapper.INSTANCE.balanceToBalanceDTO(balance),
                 HttpStatus.OK);
@@ -113,9 +124,11 @@ public class AccountingController {
             @ApiResponse(code = 401, message = "You are not authorized to view the resource"),
             @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden"),
             @ApiResponse(code = 404, message = "The resource you were trying to reach is not found")})
-    @PatchMapping(BILLS_PATH+"/{id}")
+    @PatchMapping(BILLS_PATH + "/{id}")
     public ResponseEntity<BillDTO> updateBill(@RequestBody BillDTO billDTO) {
+        LOG.trace(String.format("PATCH %s initiated", BILLS_PATH));
         Bill bill = accountingService.updateBill(BillMapper.INSTANCE.billDTOtoBill(billDTO));
+        LOG.trace(String.format("PATCH %s completed", BILLS_PATH));
         return new ResponseEntity<>(
                 BillMapper.INSTANCE.billToBillDTO(bill),
                 HttpStatus.OK);

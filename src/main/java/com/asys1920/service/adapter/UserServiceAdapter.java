@@ -12,7 +12,7 @@ import org.springframework.web.client.RestTemplate;
 @Component
 public class UserServiceAdapter {
 
-    @Value("http://localhost:8080/users/")
+    @Value( "${adapter.user.port}" )
     private String userServiceUrl;
     final RestTemplate restTemplate;
 
