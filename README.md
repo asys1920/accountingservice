@@ -6,6 +6,7 @@
 - [Features](#features)
 - [Requirements](#requirements)
 - [Quick Start / Setup](#quick-start--setup)
+- [Configuration](#configuration)
 - [API](#api)
 
 ## Description
@@ -37,6 +38,19 @@ A JDK with at least Java Version 11.
 ## Quick Start / Setup
 ### Run Local
 ### Run Docker
+
+## Configuration
+You can set the Port of the microservice using the `ACCOUNTING_PORT` environment variable.
+The default Port used by the application is `8085`. To set the Address the Microservice
+listens on you can use the `ACCOUNTING_ADDRESS` environment variable, its default value is
+`localhost`.
+
+Furthermore, you can set the Addresses of the other microservices using the environment
+variables listed below:
+
+Environment Variable | Default Value
+--- | --- 
+`USER_URL` | `http://localhost:8084/` 
 
 ## API
 To see a full documentation view the swagger documentation while running the microservice. You can
